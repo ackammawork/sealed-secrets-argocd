@@ -1,1 +1,7 @@
 keyrenewperiod: "0"
+
+metrics:
+  serviceMonitor:
+    enabled: true 
+    labels:
+      release: smf-prometheus 
