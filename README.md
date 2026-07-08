@@ -15,8 +15,8 @@ helm upgrade --reuse-values smf-sealed-secrets ./sealed-secrets-2.17.0 -n kube-s
 
 # add owner labels to all secrets
 ```bash
-kubectl label secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key sealedsecrets.bitnami.com/managed="true" --context kind-mycluster
-kubectl label secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key sealedsecrets.bitnami.com/managed="true" --context kind-mycluster2
+kubectl annotate secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key sealedsecrets.bitnami.com/managed="true" --context kind-mycluster
+kubectl annotate secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key sealedsecrets.bitnami.com/managed="true" --context kind-mycluster2
 ```
 
 ### Create and apply new argocd key for each partition (1 here)
@@ -58,9 +58,19 @@ kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --ke
 mv sealed-secrets-keys/* sealed-secrets-argocd
 ```
 
-### git rid of helm
+### Apply Argo Application
 
-### apply argo application
+### Get Rid of Helm
+```bash
+# Remove helm release secrets
+```
+
+### Upgrade and Change Controller Name
+
+```bash
+# Remove release from applicationset
+# Add fullnameOverrid in values
+
 
 
 
