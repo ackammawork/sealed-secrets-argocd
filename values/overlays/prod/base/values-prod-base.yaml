@@ -1,7 +1,19 @@
 keyrenewperiod: "0"
 
+resources:
+  requests:
+    cpu: "2m"
+    memory: "100Mib"
+  limits:
+    cpu: "10m"
+    memory: "120Mib"
+
 metrics:
   serviceMonitor:
     enabled: true 
     labels:
       release: smf-prometheus 
+
+pdb:
+  create: true 
+
