@@ -60,7 +60,7 @@ kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --ke
 
 ### Add new keys to git project and push
 ```bash
-mv sealed-secrets-keys/* sealed-secrets-argocd
+mv sealed-secrets-keys/* sealed-secrets-argocd/keys/prod
 ```
 
 ### Apply Argo ApplicationSet
