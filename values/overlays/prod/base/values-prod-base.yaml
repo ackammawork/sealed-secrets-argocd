@@ -3,10 +3,10 @@ keyrenewperiod: "0"
 resources:
   requests:
     cpu: "2m"
-    memory: "100Mib"
+    memory: "100Mi"
   limits:
     cpu: "10m"
-    memory: "120Mib"
+    memory: "120Mi"
 
 metrics:
   serviceMonitor:
