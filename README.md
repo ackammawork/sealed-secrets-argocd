@@ -7,11 +7,11 @@ kubectl get secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-ke
 kubectl create -f mycluster.yaml --context kind-mycluster2
 kubectl create -f mycluster2.yaml --context kind-mycluster
 ```
-
+<!-- 
 ### helm upgrade to set keyrenewperiod=0
 ```bash
 helm upgrade --reuse-values smf-sealed-secrets ./sealed-secrets-2.17.0 -n kube-system --set keyrenewperiod=0 --kube-context kind-mycluster
-helm upgrade --reuse-values smf-sealed-secrets ./sealed-secrets-2.17.0 -n kube-system --set keyrenewperiod=0 --kube-context kind-mycluster2
+helm upgrade --reuse-values smf-sealed-secrets ./sealed-secrets-2.17.0 -n kube-system --set keyrenewperiod=0 --kube-context kind-mycluster2 -->
 
 # add owner labels to all secrets
 ```bash
@@ -19,17 +19,13 @@ kubectl annotate secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secre
 kubectl annotate secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key sealedsecrets.bitnami.com/managed="true" --context kind-mycluster2
 ```
 
-### Create and apply new argocd key for each partition (1 here)
+### Create new argocd key for each partition (1 here)
 ```bash
 export PRIVATEKEY="argo-key.key"
 export PUBLICKEY="argo-cert.crt"
 export NAMESPACE="kube-system"
 export SECRETNAME="sealed-secrets-key-argocd"
 openssl req -x509 -days 365 -nodes -newkey rsa:4096 -keyout "$PRIVATEKEY" -out "$PUBLICKEY" -subj "/CN=sealed-secret/O=sealed-secret"
-kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY" --context kind-mycluster
-kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active --context kind-mycluster
-kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY" --context kind-mycluster2
-kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active --context kind-mycluster2
 ```
 
 ### encrypt all keys with argocd key
@@ -40,6 +36,15 @@ kubectl get secrets -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-k
 | while read -r secret; do
     kubectl get secret "$secret" -n kube-system -o yaml | kubeseal --cert argo-cert.crt -o yaml > "sealed-secrets-keys/${secret}.yaml"
 done
+```
+
+### Apply ArgoCD Key
+
+```bash
+kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY" --context kind-mycluster
+kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active --context kind-mycluster
+kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY" --context kind-mycluster2
+kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active --context kind-mycluster2
 ```
 
 ### Create new key to be used as current and encrypt with argocd key
@@ -53,24 +58,23 @@ openssl req -x509 -days 365 -nodes -newkey rsa:4096 -keyout "$PRIVATEKEY" -out "
 kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY" --dry-run=client -o yaml | kubectl label -f - "sealedsecrets.bitnami.com/sealed-secrets-key=active" --local -o yaml | kubeseal --cert argo-cert.crt -o yaml > "sealed-secrets-keys/${SECRETNAME}.yaml"
 ```
 
-### Add new keys to git project
+### Add new keys to git project and push
 ```bash
 mv sealed-secrets-keys/* sealed-secrets-argocd
 ```
 
-### Apply Argo Application
+### Apply Argo ApplicationSet
 
 ### Get Rid of Helm
 ```bash
 # Remove helm release secrets
 ```
 
-### Upgrade and Change Controller Name
+### Upgrade
 
-```bash
-# Remove release from applicationset
-# Add fullnameOverrid in values
-
+```yaml
+# Use new chart
+```
 
 
 
