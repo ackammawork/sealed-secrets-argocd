@@ -1,0 +1,10 @@
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: node-role.kubernetes.io/general
+              operator: In
+              values:
+                - general
